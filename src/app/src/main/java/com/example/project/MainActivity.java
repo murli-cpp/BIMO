@@ -3,8 +3,14 @@ package com.example.project;
 import static com.example.project.JsonHelper.getJSONObjectFromURL;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,11 +29,17 @@ import com.github.niqdev.mjpeg.DisplayMode;
 import com.github.niqdev.mjpeg.Mjpeg;
 import com.github.niqdev.mjpeg.MjpegView;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView;
+import xyz.sangcomz.stickytimelineview.callback.SectionCallback;
+import xyz.sangcomz.stickytimelineview.model.SectionInfo;
 
 public class MainActivity extends AppCompatActivity {
     MjpegView mjpegView;
@@ -36,14 +48,14 @@ public class MainActivity extends AppCompatActivity {
     EditText sett_text;
     String ip = "192.168.1.111";
     private RadarChart chartRadar;
-
+    AppDatabase db;
+    TimeLineRecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        viewFlipper = findViewById(R.id.viewflipper);
         text_chart = findViewById(R.id.chart_emotion);
         text_camera = findViewById(R.id.camera_emotion);
         mjpegView = findViewById(R.id.mjpegViewDefault);
@@ -51,8 +63,33 @@ public class MainActivity extends AppCompatActivity {
         sett_text = findViewById(R.id.ip);
         welcome_text = findViewById(R.id.welcome_status);
         chartRadar = findViewById(R.id.chart_radar);
+        viewFlipper = findViewById(R.id.viewflipper);
 
-        viewFlipper.setDisplayedChild(2);
+        //viewFlipper.setDisplayedChild(2);
+        //viewFlipper.setDisplayedChild(3);
+
+        initDrawable();
+
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "events").build();
+
+
+        recyclerView = findViewById(R.id.vertical_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this,
+                RecyclerView.VERTICAL,
+                false));
+
+        List<Singer> singerList = getSingerList();
+
+        recyclerView.addItemDecoration(getSectionCallback(singerList));
+        recyclerView.setAdapter(new SingerAdapter(getLayoutInflater(), singerList, R.layout.recycler_vertical_row));
+
+
+        new EventGetAllTask().execute();
+
+
+
+
         int TIMEOUT = 3600;
         Mjpeg.newInstance().open(String.format("http://%s:56000/stream", ip), TIMEOUT).subscribe(inputStream -> {
                     mjpegView.setSource(inputStream);
@@ -95,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         button_statistic.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                viewFlipper.setDisplayedChild(0);
+                viewFlipper.setDisplayedChild(7);
             }
         });
         button_camera.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
                 sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");            }
         });
     }
+
+
 
     class FetchData extends AsyncTask<String, JSONObject, Boolean> {
 
@@ -241,4 +280,91 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
+    private Drawable icFinkl, icBuzz, icWannaOne, icGirlsGeneration, icSolo;
+
+
+    class EventGetAllTask extends AsyncTask<Void, List<Event>, List<Event>> {
+        @Override
+        protected List<Event> doInBackground(final Void... args) {
+            //while (true)
+            {
+
+                try {
+                    EventDao eventDao = db.eventDao();
+                    List<Event> events = eventDao.getAll();
+                    super.publishProgress(events);
+                    return events;
+                } catch (Exception ex) {
+                    throw ex;
+                }
+            }
+
+            //return new ArrayList<Event>();
+        }
+        protected void onProgressUpdate(List<Event>... value) {
+            try {
+
+                List<Singer> singerList = getSingerList();
+
+                recyclerView.addItemDecoration(getSectionCallback(singerList));
+                recyclerView.setAdapter(new SingerAdapter(getLayoutInflater(), singerList, R.layout.recycler_vertical_row));
+
+            } catch (Exception e) {
+                throw e;
+            }
+
+        }
+    }
+
+    private SectionCallback getSectionCallback(final List<Singer> singerList) {
+        return new SectionCallback() {
+
+            @Nullable
+            @Override
+            public SectionInfo getSectionHeader(int position) {
+                Singer singer = singerList.get(position);
+                Drawable dot;
+                switch (singer.getGroup()) {
+                    case "FIN.K.L": {
+                        dot = icFinkl;
+                        break;
+                    }
+                    case "Girls' Generation": {
+                        dot = icGirlsGeneration;
+                        break;
+                    }
+                    case "Buzz": {
+                        dot = icBuzz;
+                        break;
+                    }
+                    case "Wanna One": {
+                        dot = icWannaOne;
+                        break;
+                    }
+                    default: {
+                        dot = icSolo;
+                    }
+                }
+                return new SectionInfo(singer.getDebuted(), singer.getGroup(), dot);
+            }
+
+            @Override
+            public boolean isSection(int position) {
+                return !singerList.get(position).getDebuted().equals(singerList.get(position - 1).getDebuted());
+            }
+        };
+    }
+
+    private List<Singer> getSingerList() {
+        return new SingerRepo().getSingerList();
+    }
+
+    private void initDrawable() {
+        icFinkl = AppCompatResources.getDrawable(this, R.drawable.ic_finkl);
+        icBuzz = AppCompatResources.getDrawable(this, R.drawable.ic_buzz);
+        icWannaOne = AppCompatResources.getDrawable(this, R.drawable.ic_wannaone);
+        icGirlsGeneration = AppCompatResources.getDrawable(this, R.drawable.ic_girlsgeneration);
+        icSolo = AppCompatResources.getDrawable(this, R.drawable.ic_wannaone);
+    }
 }
+
