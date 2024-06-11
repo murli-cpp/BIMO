@@ -2,16 +2,21 @@ package com.example.project;
 
 import static com.example.project.JsonHelper.getJSONObjectFromURL;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +39,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView;
@@ -50,8 +57,19 @@ public class MainActivity extends AppCompatActivity {
     private RadarChart chartRadar;
     AppDatabase db;
     TimeLineRecyclerView recyclerView;
+    View drawable;
+    private EventAdapter timelineAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            if (!Environment.isExternalStorageManager()) {
+                var p = new Intent();
+                p.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivity(p);
+            }
+        }
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -65,40 +83,29 @@ public class MainActivity extends AppCompatActivity {
         chartRadar = findViewById(R.id.chart_radar);
         viewFlipper = findViewById(R.id.viewflipper);
 
-        //viewFlipper.setDisplayedChild(2);
-        //viewFlipper.setDisplayedChild(3);
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "events")
+                .build();
 
-        initDrawable();
-
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "events").build();
-
+        new EventGetAllTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         recyclerView = findViewById(R.id.vertical_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this,
                 RecyclerView.VERTICAL,
                 false));
-
-        List<Singer> singerList = getSingerList();
-
-        recyclerView.addItemDecoration(getSectionCallback(singerList));
-        recyclerView.setAdapter(new SingerAdapter(getLayoutInflater(), singerList, R.layout.recycler_vertical_row));
-
-
-        new EventGetAllTask().execute();
-
-
+        //recyclerView.addItemDecoration(getSectionCallback(value[0]));
+        timelineAdapter = new EventAdapter(getLayoutInflater(), this, R.layout.recycler_vertical_row);
+        recyclerView.setAdapter(timelineAdapter);
 
 
         int TIMEOUT = 3600;
         Mjpeg.newInstance().open(String.format("http://%s:56000/stream", ip), TIMEOUT).subscribe(inputStream -> {
-                    mjpegView.setSource(inputStream);
-                    mjpegView.setRotate(180);
-                    mjpegView.setDisplayMode(DisplayMode.BEST_FIT);
-                    mjpegView.showFps(true);
-                });
+            mjpegView.setSource(inputStream);
+            mjpegView.setRotate(180);
+            mjpegView.setDisplayMode(DisplayMode.BEST_FIT);
+            mjpegView.showFps(true);
+        });
 
-        new FetchData().execute();
+        new FetchData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         sett_text.setText(ip);
         viewFlipper.setDisplayedChild(5);
@@ -166,30 +173,34 @@ public class MainActivity extends AppCompatActivity {
         happy.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "3");            }
+                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "3");
+            }
         });
         fear.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "2");            }
+                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "2");
+            }
         });
         sad.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "4");            }
+                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "4");
+            }
         });
         suprised.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "5");            }
+                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "5");
+            }
         });
         angry.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");            }
+                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");
+            }
         });
     }
-
 
 
     class FetchData extends AsyncTask<String, JSONObject, Boolean> {
@@ -201,7 +212,9 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObject = getJSONObjectFromURL(String.format("http://%s:5000/stats", ip));
                     super.publishProgress(jsonObject);
                     Thread.sleep(1000);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    Log.e("network", "FetchData error", e);
+                }
             }
         }
 
@@ -215,11 +228,15 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.text_chart.setText(value[0].getString("lastEmotionName"));
                 MainActivity.this.text_camera.setText(value[0].getString("lastEmotionName"));
 
-            } catch (JSONException e) {}
+            } catch (JSONException e) {
+                Log.e("ui", "Display emotion error", e);
+            }
 
             try {
                 setDataRadar(value[0]);
-            } catch (JSONException e) {}
+            } catch (JSONException e) {
+                Log.e("ui", "radar statistic error", e);
+            }
         }
 
         private String[] emotions = new String[]{
@@ -275,39 +292,87 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jsonObject = getJSONObjectFromURL(String.format("http://%s:5000/emotion/%s", ip, args[0]));
                 super.publishProgress(jsonObject);
 
-            } catch (Exception e) { return false; }
+            } catch (Exception e) {
+                Log.e("network", "FetchData emotions error", e);
+                return false;
+            }
 
             return true;
         }
     }
+
     private Drawable icFinkl, icBuzz, icWannaOne, icGirlsGeneration, icSolo;
 
 
-    class EventGetAllTask extends AsyncTask<Void, List<Event>, List<Event>> {
-        @Override
-        protected List<Event> doInBackground(final Void... args) {
-            //while (true)
-            {
+    class EventGetAllTask extends AsyncTask<Void, List<Event>, Void> {
+        private EventDao eventDao;
+        private Date lastUpdated;
 
+        @Override
+        protected void onPreExecute() {
+            eventDao = db.eventDao();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... args) {
+            eventDao.Clear();
+            lastUpdated = eventDao.getMaxUpdated();
+
+            while (true) {
                 try {
-                    EventDao eventDao = db.eventDao();
-                    List<Event> events = eventDao.getAll();
-                    super.publishProgress(events);
-                    return events;
+                    if (LoadUpdate()) {
+                        Thread.sleep(1000);
+                    } else {
+                        Thread.sleep(10000);
+                    }
                 } catch (Exception ex) {
-                    throw ex;
+                    Log.e("network", "Loading update error", ex);
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
-
-            //return new ArrayList<Event>();
         }
+
+        private boolean LoadUpdate() throws IOException, JSONException {
+            var timestamp = (long) (lastUpdated.getTime() / 1000.0);
+            JSONObject jsonObject = getJSONObjectFromURL(String.format("http://%s:5000/get-update/%d", ip, timestamp));
+            JSONArray data = jsonObject.getJSONArray("data");
+            if (data.length() == 0) {
+                return false;
+            }
+            List<Event> newEvents = new ArrayList<>();
+            for (int i = 0; i < data.length(); i++) {
+                var j = data.getJSONObject(i);
+                var e = new Event();
+                e.id = j.getInt("id");
+                e.start = new Date(((long) j.getDouble("start_dt") * 1000));
+                if (!j.isNull("end_dt")) e.end = new Date(((long) j.getDouble("end_dt") * 1000));
+                if (!j.isNull("updated_dt"))
+                    e.updated = new Date(((long) j.getDouble("updated_dt") * 1000));
+                if (!j.isNull("duration")) e.duration = j.getInt("duration");
+                e.type = j.getString("type");
+                e.title = j.getString("title");
+                e.object = j.getString("object");
+                e.filePhoto = j.getString("file_photo");
+                e.fileAudio = j.getString("file_audio");
+                e.fileVideo = j.getString("file_video");
+                newEvents.add(e);
+            }
+            Log.d("db", "insert data: " + newEvents.size());
+            eventDao.insertAll(newEvents);
+            lastUpdated = eventDao.getMaxUpdated();
+            return true;
+        }
+
         protected void onProgressUpdate(List<Event>... value) {
             try {
 
-                List<Singer> singerList = getSingerList();
-
-                recyclerView.addItemDecoration(getSectionCallback(singerList));
-                recyclerView.setAdapter(new SingerAdapter(getLayoutInflater(), singerList, R.layout.recycler_vertical_row));
+                Log.d("db", "Records in db: " + value[0].size());
+//                recyclerView.addItemDecoration(getSectionCallback(value[0]));
+//                recyclerView.setAdapter(new EventAdapter(getLayoutInflater(), value[0], R.layout.recycler_vertical_row, R.drawable.emoition_happy));
 
             } catch (Exception e) {
                 throw e;
@@ -316,41 +381,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private SectionCallback getSectionCallback(final List<Singer> singerList) {
+    private SectionCallback getSectionCallback(final List<Event> eventList) {
         return new SectionCallback() {
 
             @Nullable
             @Override
             public SectionInfo getSectionHeader(int position) {
-                Singer singer = singerList.get(position);
-                Drawable dot;
-                switch (singer.getGroup()) {
-                    case "FIN.K.L": {
-                        dot = icFinkl;
-                        break;
-                    }
-                    case "Girls' Generation": {
-                        dot = icGirlsGeneration;
-                        break;
-                    }
-                    case "Buzz": {
-                        dot = icBuzz;
-                        break;
-                    }
-                    case "Wanna One": {
-                        dot = icWannaOne;
-                        break;
-                    }
-                    default: {
-                        dot = icSolo;
-                    }
-                }
-                return new SectionInfo(singer.getDebuted(), singer.getGroup(), dot);
+                Event event = eventList.get(position);
+                Drawable dot = icSolo;
+                return new SectionInfo(event.start.toString(), event.type, dot);
             }
 
             @Override
             public boolean isSection(int position) {
-                return !singerList.get(position).getDebuted().equals(singerList.get(position - 1).getDebuted());
+                return !eventList.get(position).start.toString().equals(eventList.get(position - 1).start.toString());
             }
         };
     }
@@ -359,12 +403,6 @@ public class MainActivity extends AppCompatActivity {
         return new SingerRepo().getSingerList();
     }
 
-    private void initDrawable() {
-        icFinkl = AppCompatResources.getDrawable(this, R.drawable.ic_finkl);
-        icBuzz = AppCompatResources.getDrawable(this, R.drawable.ic_buzz);
-        icWannaOne = AppCompatResources.getDrawable(this, R.drawable.ic_wannaone);
-        icGirlsGeneration = AppCompatResources.getDrawable(this, R.drawable.ic_girlsgeneration);
-        icSolo = AppCompatResources.getDrawable(this, R.drawable.ic_wannaone);
-    }
 }
+
 
