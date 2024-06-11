@@ -13,9 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by paetztm on 2/6/2017.
@@ -23,9 +27,11 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
     private final LayoutInflater layoutInflater;
     private FetchEventsUpdateFromDB fetchEventsUpdateFromDBTask;
-    private List<Event> eventList;
+    public List<Event> eventList;
     private final int rowLayout;
-    private final MainActivity mainActivity;
+    private MainActivity mainActivity;
+    private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss", new Locale("ru"));
+
 
     public EventAdapter(LayoutInflater layoutInflater, MainActivity activity, @LayoutRes int rowLayout) {
         this.layoutInflater = layoutInflater;
@@ -42,11 +48,52 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return new ViewHolder(v);
     }
 
+
+    public LocalDateTime ToLocalDate(Date dateToConvert) {
+        return  (
+                dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        );
+    }
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Event event = eventList.get(position);
         holder.fullName.setText(event.title);
-        holder.pic.setImageURI(Uri.fromFile(new File("storage/180A-251C/Download/cat.jpg")));
+        holder.date.setText(ToLocalDate(event.start).format(timeFormatter));
+
+        int icon = R.drawable.cat;
+        switch (event.object) {
+            case "cat":
+                icon = R.drawable.cat;
+                break;
+            case "dog":
+                icon = R.drawable.dog;
+                break;
+            case "person":
+                icon = R.drawable.person;
+                break;
+            case "face":
+                icon = R.drawable.face;
+                break;
+
+        }
+        holder.icon.setImageResource(icon);
+
+        if (event.filePhoto != null && event.filePhoto != "null" && event.filePhoto != "") {
+            var file = new File(this.mainActivity.filesDir, event.filePhoto);
+            if (file.exists()) {
+                holder.pic.setVisibility(View.VISIBLE);
+                holder.pic.setImageURI(Uri.fromFile(file));
+            } else {
+                holder.pic.setVisibility(View.INVISIBLE);
+            }
+        } else if (event.fileAudio != null && event.fileAudio != "null" && event.fileAudio != "") {
+            holder.pic.setVisibility(View.VISIBLE);
+            holder.pic.setImageResource(R.drawable.audio);
+        } else {
+            holder.pic.setVisibility(View.INVISIBLE);
+        }
+
+
     }
 
     @Override
@@ -56,11 +103,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView fullName;
+        public final TextView date;
         public final ImageView pic;
+        public final ImageView icon;
+
 
         public ViewHolder(View view) {
             super(view);
             pic = view.findViewById(R.id.pic);
+            icon = view.findViewById(R.id.icon);
+            date = view.findViewById(R.id.date);
             fullName = view.findViewById(R.id.full_name_tv);
         }
     }
@@ -85,10 +137,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                     if (this.lastUpdated == null || this.lastUpdated != lastUpdated) {
                         this.lastUpdated = lastUpdated;
                         Log.d("db", "load data...");
-                        var events = dao.getAll(10);
+                        var events = dao.getAll(20);
                         super.publishProgress(events);
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (Exception e) {
                     Log.e("network", "FetchData error", e);
                 }
@@ -98,7 +150,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         @Override
         protected void onProgressUpdate(List<Event>... value) {
             eventList = value[0];
-            Log.d("db", "db count:"+eventList.size());
+            Log.d("db", "db count:" + eventList.size());
             notifyDataSetChanged();
         }
     }

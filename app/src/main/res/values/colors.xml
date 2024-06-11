@@ -5,4 +5,6 @@
     <color name="BIMO">#5FBAA5</color>
     <color name="BIMO_face">#C6E2C0</color>
     <color name="text_color">#FF49454F</color>
+    <color name="warm_white">#E8F4E6</color>
+
 </resources>

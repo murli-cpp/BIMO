@@ -14,8 +14,15 @@
         android:layout_height="wrap_content"
         app:isSticky="true"
         android:layout_weight="1"
-        app:timeLineColor="#2196F3"
-        app:timeLineDotColor="#2196F3"
+        app:timeLineColor="@color/warm_white"
+        app:timeLineDotColor="@color/BIMO"
+
+        app:sectionTitleTextSize="22sp"
+        app:sectionTitleTextColor="@color/text_color"
+        app:sectionSubTitleTextSize="18sp"
+        app:sectionSubTitleTextColor="@color/text_color"
+
+        app:sectionBackgroundColor="@color/BIMO_face"
         app:timeLineDotRadius="4dp"
         app:timeLineDotStrokeColor="#ffffff"
         app:timeLineDotStrokeSize="2dp"

@@ -2,6 +2,8 @@ package com.example.project;
 
 import static com.example.project.JsonHelper.getJSONObjectFromURL;
 
+import static java.time.format.FormatStyle.MEDIUM;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,10 +42,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView;
 import xyz.sangcomz.stickytimelineview.callback.SectionCallback;
@@ -59,10 +73,15 @@ public class MainActivity extends AppCompatActivity {
     TimeLineRecyclerView recyclerView;
     View drawable;
     private EventAdapter timelineAdapter;
+    public
+    File filesDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
+        Locale locale = new Locale("ru");
+        Locale.setDefault(locale);
         if (Build.VERSION.SDK_INT >= 30) {
             if (!Environment.isExternalStorageManager()) {
                 var p = new Intent();
@@ -71,6 +90,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onCreate(savedInstanceState);
+
+        try{
+            filesDir = getApplicationContext().getExternalFilesDir("BIMO");
+
+            Log.d("files", "каталог " + filesDir.getPath());
+           filesDir.mkdirs();
+
+        }
+        catch (Exception ex){
+            Log.e("files", "ошибка создания папки");
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -92,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this,
                 RecyclerView.VERTICAL,
                 false));
-        //recyclerView.addItemDecoration(getSectionCallback(value[0]));
         timelineAdapter = new EventAdapter(getLayoutInflater(), this, R.layout.recycler_vertical_row);
+        recyclerView.addItemDecoration(getSectionCallback(timelineAdapter));
         recyclerView.setAdapter(timelineAdapter);
 
 
@@ -315,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(final Void... args) {
-            eventDao.Clear();
+            //eventDao.Clear();
             lastUpdated = eventDao.getMaxUpdated();
 
             while (true) {
@@ -360,11 +390,39 @@ public class MainActivity extends AppCompatActivity {
                 e.fileAudio = j.getString("file_audio");
                 e.fileVideo = j.getString("file_video");
                 newEvents.add(e);
+                downloadFile(e.fileVideo);
+                downloadFile(e.fileAudio);
+                downloadFile(e.filePhoto);
             }
             Log.d("db", "insert data: " + newEvents.size());
             eventDao.insertAll(newEvents);
             lastUpdated = eventDao.getMaxUpdated();
             return true;
+        }
+
+        private void downloadFile(String fileName) {
+            if(fileName == "" || fileName == null || fileName == "null"){
+                return;
+            }
+//            Log.d("files", "getFilesDir=" + getApplicationContext().getFilesDir());
+//            Log.d("files", "getExternalFilesDir=" + getApplicationContext().getExternalFilesDir(null));
+//            Log.d("files", "Environment.getExternalStorageDirectory=" + Environment.getExternalStorageDirectory());
+//            Log.d("files", "Environment.getStorageDirectory=" + Environment.getStorageDirectory());
+            try {
+                var file = new File(filesDir, fileName);
+                if(file.exists())
+                    return;
+
+                Log.d("files", "Загрузка файла " + fileName);
+                Boolean success = HttpDownloadUtility.downloadFile(String.format("http://%s:5000/files/%s", ip, fileName), filesDir.getPath(), fileName);
+                Log.d("files", "Успешная загрузка " + fileName);
+                Log.d("files", success.toString());
+
+            } catch (IOException e) {
+                Log.d("files", "Ошибка загрузки " + fileName);
+
+                throw new RuntimeException(e);
+            }
         }
 
         protected void onProgressUpdate(List<Event>... value) {
@@ -381,28 +439,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private SectionCallback getSectionCallback(final List<Event> eventList) {
+    public LocalDateTime ToLocalDate(Date dateToConvert) {
+        return  (
+                dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        );
+    }
+
+    //private SimpleDateFormat shortDateFormatter = new SimpleDateFormat("EEE, dd MMMM yyyy");
+    private DateTimeFormatter shortDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMMM yyyy", new Locale("ru"));
+    private SectionCallback getSectionCallback(final EventAdapter eventListAdapter) {
         return new SectionCallback() {
 
             @Nullable
             @Override
             public SectionInfo getSectionHeader(int position) {
+                var eventList = eventListAdapter.eventList;
                 Event event = eventList.get(position);
                 Drawable dot = icSolo;
-                return new SectionInfo(event.start.toString(), event.type, dot);
+                return new SectionInfo(
+                        ToLocalDate(event.start).format(shortDateFormatter),
+                        event.type,
+                        dot);
             }
 
             @Override
             public boolean isSection(int position) {
-                return !eventList.get(position).start.toString().equals(eventList.get(position - 1).start.toString());
+                var eventList = eventListAdapter.eventList;
+                var a = ToLocalDate(eventList.get(position).start).truncatedTo(ChronoUnit.DAYS);
+                var b = ToLocalDate(eventList.get(position - 1).start).truncatedTo(ChronoUnit.DAYS);
+                return false;
             }
         };
     }
-
-    private List<Singer> getSingerList() {
-        return new SingerRepo().getSingerList();
-    }
-
 }
 
 
