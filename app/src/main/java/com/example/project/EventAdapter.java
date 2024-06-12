@@ -53,7 +53,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             Log.d("ui", "card view click:" +( (Event) v1.getTag()).filePhoto);
             Event event = (Event) v1.getTag();
 
-            mainActivity.viewFlipper.setDisplayedChild(8);
+            mainActivity.viewFlipper.setDisplayedChild(mainActivity.VF_TIMELINE_DETAILS);
 
             if(event.filePhoto != null && event.filePhoto != "null" && event.filePhoto != "") {
                 var file = new File(this.mainActivity.filesDir, event.filePhoto);
@@ -208,7 +208,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                     if (this.lastUpdated == null || this.lastUpdated != lastUpdated) {
                         this.lastUpdated = lastUpdated;
                         Log.d("db", "load data...");
-                        var events = dao.getAll(20);
+                        var events = dao.getAll(50);
                         super.publishProgress(events);
                     }
                     Thread.sleep(5000);

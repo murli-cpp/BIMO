@@ -92,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
     PlayerView playerView;
     public ExoPlayer player;
     Button back_button;
+    int VF_STAT = 0;
+    int VF_CAM = 1;
+    int VF_EMO = 2;
+    int VF_INSTR = 3;
+    int VF_SETT = 4;
+    int VF_WELCOME = 5;
+    int VF_TIMELINE = 6;
+    int VF_TIMELINE_DETAILS = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,12 +175,13 @@ public class MainActivity extends AppCompatActivity {
         new FetchData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         sett_text.setText(ip);
-        viewFlipper.setDisplayedChild(5);
+        viewFlipper.setDisplayedChild(VF_WELCOME);
 
         Button apply = findViewById(R.id.settings_apply);
         Button clearAll = findViewById(R.id.clear_all);
         Button buttonWelcome = findViewById(R.id.welcome_continue);
         ImageButton button_statistic = findViewById(R.id.button1);
+        ImageButton button_timeline = findViewById(R.id.button_timeline);
         ImageButton button_camera = findViewById(R.id.button2);
         ImageButton button_emotions = findViewById(R.id.button3);
         ImageButton button_instruction = findViewById(R.id.button4);
@@ -186,90 +195,49 @@ public class MainActivity extends AppCompatActivity {
 
 
         back_button.setOnClickListener(v -> {
-            viewFlipper.setDisplayedChild(7);
+            viewFlipper.setDisplayedChild(VF_TIMELINE);
         });
 
-        apply.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ip = sett_text.getText().toString();
-            }
+        apply.setOnClickListener(v -> ip = sett_text.getText().toString());
+
+        clearAll.setOnClickListener(v -> {
+            //db.eventDao().Clear().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
         });
 
-        clearAll.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //db.eventDao().Clear().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-            }
-        });
-
-        buttonWelcome.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(1);
-            }
-        });
+        buttonWelcome.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_TIMELINE));
 
 
-        button_statistic.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(7);
-            }
-        });
-        button_camera.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(1);
-            }
-        });
-        button_emotions.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(2);
-            }
-        });
-        button_instruction.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(3);
-            }
-        });
-        button_settings.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(4);
-            }
-        });
+        button_statistic.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_STAT));
+        button_timeline.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_TIMELINE));
+        button_camera.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_CAM));
+        button_emotions.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_EMO));
+        button_instruction.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_INSTR));
+        button_settings.setOnClickListener(v -> viewFlipper.setDisplayedChild(VF_SETT));
 
 
-        neutral.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "6");
-            }
+        neutral.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "6");
         });
-        happy.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "3");
-            }
+        happy.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "3");
         });
-        fear.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "2");
-            }
+        fear.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "2");
         });
-        sad.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "4");
-            }
+        sad.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "4");
         });
-        suprised.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "5");
-            }
+        suprised.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "5");
         });
-        angry.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SendData sendData = new SendData();
-                sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");
-            }
+        angry.setOnClickListener(v -> {
+            SendData sendData = new SendData();
+            sendData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");
         });
     }
 

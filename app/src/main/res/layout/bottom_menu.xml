@@ -12,40 +12,48 @@
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/laymax"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="70dp"
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             app:justifyContent="space_around">
 
             <ImageButton
-                android:id="@+id/button1"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:id="@+id/button_timeline"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:scaleType="fitCenter"
                 android:background="@drawable/border"
-                android:src="@drawable/icon_statistic" />
+                android:src="@drawable/icon_calendar" />
 
             <ImageButton
                 android:id="@+id/button2"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:scaleType="fitCenter"
                 android:background="@drawable/border"
                 android:src="@drawable/icon_video" />
 
             <ImageButton
+                android:id="@+id/button1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:scaleType="fitCenter"
+                android:background="@drawable/border"
+                android:src="@drawable/icon_statistic" />
+
+            <ImageButton
                 android:id="@+id/button3"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:scaleType="fitCenter"
                 android:background="@drawable/border"
                 android:src="@drawable/icon_emotions" />
 
             <ImageButton
                 android:id="@+id/button4"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:scaleType="fitCenter"
                 android:background="@drawable/border"
                 android:src="@drawable/icon_instriction" />
