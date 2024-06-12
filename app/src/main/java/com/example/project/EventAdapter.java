@@ -1,6 +1,7 @@
 package com.example.project;
 
 import androidx.annotation.LayoutRes;
+import androidx.media3.common.MediaItem;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.net.Uri;
@@ -51,11 +52,22 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         v.setOnClickListener(v1 -> {
             Log.d("ui", "card view click:" +( (Event) v1.getTag()).filePhoto);
             Event event = (Event) v1.getTag();
-            var file = new File(this.mainActivity.filesDir, event.filePhoto);
 
             mainActivity.viewFlipper.setDisplayedChild(8);
+
+            if(event.filePhoto != null && event.filePhoto != "null" && event.filePhoto != "") {
+                var file = new File(this.mainActivity.filesDir, event.filePhoto);
+                if(file.exists()) {
+                    mainActivity.eventDetailsImage.setImageURI(Uri.fromFile(file));
+                }
+                else{
+                    mainActivity.eventDetailsImage.setVisibility(View.GONE);
+                }
+            }
+            else{
+                mainActivity.eventDetailsImage.setVisibility(View.GONE);
+            }
             mainActivity.eventDetails.setTag(v1.getTag());
-            mainActivity.eventDetailsImage.setImageURI(Uri.fromFile(file));
             mainActivity.eventDetailsTimeBegin.setText(ToLocalDate(event.start).format(timeFormatter));
             mainActivity.eventDetailsTimeEnd.setText(ToLocalDate(event.end).format(timeFormatter));
             mainActivity.eventDetailsDate.setText(ToLocalDate(event.start).format(shortDateFormatter));
@@ -79,6 +91,20 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
             mainActivity.eventDetailsObject.setImageResource(icon);
 
+            if(event.fileAudio != null && event.fileAudio != "null" && event.fileAudio != "") {
+                var file = new File(this.mainActivity.filesDir, event.fileAudio);
+                if(file.exists()) {
+                    MediaItem mediaItem = MediaItem.fromUri(Uri.fromFile(file));
+                    mainActivity.player.setMediaItem(mediaItem);
+                    mainActivity.player.prepare();
+                }
+                else{
+                    mainActivity.playerView.setVisibility(View.GONE);
+                }
+            }
+            else{
+                mainActivity.playerView.setVisibility(View.GONE);
+            }
 
         });
 

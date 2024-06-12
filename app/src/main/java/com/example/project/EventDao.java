@@ -10,6 +10,9 @@ import androidx.room.TypeConverters;
 import java.util.Date;
 import java.util.List;
 
+import rx.Single;
+
+
 @Dao
 public interface EventDao {
     @Query("SELECT MAX(updated_dt) FROM Event")

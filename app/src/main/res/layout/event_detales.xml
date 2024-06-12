@@ -1,52 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/eventDetails"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/eventDetailsImage"
-            android:adjustViewBounds="true"
-            android:scaleType="fitStart"/>
+        android:layout_height="match_parent">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-            android:padding="16dp"
-                android:orientation="vertical">
+            android:id="@+id/eventDetails"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/text_color"
-                    android:textSize="25sp"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/comic_sans_ms"
-                    android:id="@+id/eventDetailsDate"
-                    android:text="пн, 1 января 0000" />
+                    android:layout_height="100dp"
+                    android:orientation="horizontal">
 
-                <ImageView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <Button
+                            android:id="@+id/button_back"
+                            android:gravity="center"
+                            android:layout_width="40dp"
+                            android:layout_height="70dp"
+                            android:layout_margin="0dp"
+                            android:background="@color/transparent"
+                            android:drawablePadding="0dp"
+                            android:fontFamily="@font/comic_sans_ms"
+                            android:includeFontPadding="false"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:maxHeight="60dp"
+                            android:minHeight="0dp"
+                            android:padding="0dp"
+                            android:paddingVertical="0dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
+                            android:text="&lt;"
+                            android:textColor="@color/text_color"
+                            android:textSize="50sp"
+                            app:iconPadding="0dp"
+                            app:strokeWidth="0dp"></Button>
+
+                        <TextView
+                            android:gravity="center_vertical"
+                            android:id="@+id/eventDetailsDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/comic_sans_ms"
+                            android:text="пн, 1 января 0000"
+                            android:textColor="@color/text_color"
+                            android:layout_weight="1"
+                            android:paddingLeft="0dp"
+                            android:textSize="25sp" />
+                    </LinearLayout>
+
+                    <ImageView
                         android:id="@+id/eventDetailsIcon"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                    android:src="@drawable/cat"
                         android:adjustViewBounds="true"
-                        android:scaleType="fitEnd"/>
+                        android:scaleType="fitEnd"
+                        app:zoomage_zoomable="true"
+                        app:zoomage_translatable="true"
+                        android:src="@drawable/cat" />
 
 
-            </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -56,22 +90,22 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:fontFamily="@font/comic_sans_ms"
-                        android:textColor="@color/text_color"
-                        android:textSize="25sp"
                         android:layout_weight="0.35"
-                        android:text="Время начала"/>
+                        android:fontFamily="@font/comic_sans_ms"
+                        android:text="Время начала"
+                        android:textColor="@color/text_color"
+                        android:textSize="25sp" />
 
                     <TextView
-                        android:textColor="@color/text_color"
+                        android:id="@+id/eventDetailsTimeBegin"
                         android:layout_width="match_parent"
-                        android:fontFamily="@font/comic_sans_ms"
                         android:layout_height="match_parent"
                         android:layout_weight="0.65"
+                        android:fontFamily="@font/comic_sans_ms"
+                        android:gravity="right"
                         android:text="00:00:00"
-                        android:gravity="right"
-                        android:textSize="25sp"
-                        android:id="@+id/eventDetailsTimeBegin" />
+                        android:textColor="@color/text_color"
+                        android:textSize="25sp" />
 
                 </LinearLayout>
 
@@ -81,37 +115,46 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:textColor="@color/text_color"
-                        android:fontFamily="@font/comic_sans_ms"
-                        android:textSize="25sp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="0.35"
-                        android:text="Время окончания" />
+                        android:fontFamily="@font/comic_sans_ms"
+                        android:text="Время окончания"
+                        android:textColor="@color/text_color"
+                        android:textSize="25sp" />
 
                     <TextView
+                        android:id="@+id/eventDetailsTimeEnd"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textColor="@color/text_color"
-                        android:textSize="25sp"
-                        android:gravity="right"
                         android:layout_weight="0.65"
                         android:fontFamily="@font/comic_sans_ms"
-                        android:id="@+id/eventDetailsTimeEnd"
-                        android:text="00:00:00" />
+                        android:gravity="right"
+                        android:text="00:00:00"
+                        android:textColor="@color/text_color"
+                        android:textSize="25sp" />
 
 
                 </LinearLayout>
 
+                <com.jsibbold.zoomage.ZoomageView
+                    android:id="@+id/eventDetailsImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitStart" />
+
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/player"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="20dp"
+                    app:artwork_display_mode="off"
+                    app:use_artwork="false" />
 
 
             </LinearLayout>
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

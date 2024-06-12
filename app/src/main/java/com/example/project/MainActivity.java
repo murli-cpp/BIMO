@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -39,6 +41,7 @@ import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet;
 import com.github.niqdev.mjpeg.DisplayMode;
 import com.github.niqdev.mjpeg.Mjpeg;
 import com.github.niqdev.mjpeg.MjpegView;
+import com.jsibbold.zoomage.ZoomageView;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -61,6 +64,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView;
 import xyz.sangcomz.stickytimelineview.callback.SectionCallback;
 import xyz.sangcomz.stickytimelineview.model.SectionInfo;
@@ -82,8 +87,11 @@ public class MainActivity extends AppCompatActivity {
     CardView cardView;
     LinearLayout eventDetails;
     TextView eventDetailsTimeBegin, eventDetailsTimeEnd, eventDetailsDate;
-    ImageView eventDetailsImage, eventDetailsObject;
-
+    ZoomageView eventDetailsImage;
+    ImageView eventDetailsObject;
+    PlayerView playerView;
+    public ExoPlayer player;
+    Button back_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
         eventDetailsTimeBegin = findViewById(R.id.eventDetailsTimeBegin);
         eventDetailsTimeEnd = findViewById(R.id.eventDetailsTimeEnd);
         eventDetailsDate = findViewById(R.id.eventDetailsDate);
-
+        playerView = findViewById(R.id.player);
+        back_button = findViewById(R.id.button_back);
 
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "events")
                 .build();
@@ -142,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(timelineAdapter);
 
 
-
         int TIMEOUT = 3600;
         Mjpeg.newInstance().open(String.format("http://%s:56000/stream", ip), TIMEOUT).subscribe(inputStream -> {
             mjpegView.setSource(inputStream);
@@ -150,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
             mjpegView.setDisplayMode(DisplayMode.BEST_FIT);
             mjpegView.showFps(true);
         });
+
+
+        player = new ExoPlayer.Builder(getApplicationContext()).build();
+        playerView.setPlayer(player);
+
 
         new FetchData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -172,6 +185,9 @@ public class MainActivity extends AppCompatActivity {
         ImageButton angry = findViewById(R.id.angry);
 
 
+        back_button.setOnClickListener(v -> {
+            viewFlipper.setDisplayedChild(7);
+        });
 
         apply.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -181,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
         clearAll.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                //db.eventDao().Clear().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
             }
         });
 
