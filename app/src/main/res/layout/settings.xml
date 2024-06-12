@@ -47,11 +47,25 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:layout_marginEnd="20dp"
             android:backgroundTint="@color/BIMO_face"
             android:fontFamily="@font/comic_sans_ms"
             android:text="Применить"
+            android:textColor="#FF49454F"
+            android:textSize="26sp"
+            app:cornerRadius="0dp" />
+
+        <Button
+            android:id="@+id/clear_all"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@color/BIMO_face"
+            android:fontFamily="@font/comic_sans_ms"
+            android:text="Очистить данные"
             android:textColor="#FF49454F"
             android:textSize="26sp"
             app:cornerRadius="0dp" />

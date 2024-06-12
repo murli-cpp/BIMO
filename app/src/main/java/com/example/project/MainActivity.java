@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -24,6 +25,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
@@ -75,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
     private EventAdapter timelineAdapter;
     public
     File filesDir;
+    LinearLayout layout;
+    CardView cardView;
+    LinearLayout eventDetails;
+    TextView eventDetailsTimeBegin, eventDetailsTimeEnd, eventDetailsDate;
+    ImageView eventDetailsImage, eventDetailsObject;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +100,13 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
 
-        try{
+        try {
             filesDir = getApplicationContext().getExternalFilesDir("BIMO");
 
             Log.d("files", "каталог " + filesDir.getPath());
-           filesDir.mkdirs();
+            filesDir.mkdirs();
 
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e("files", "ошибка создания папки");
         }
 
@@ -112,6 +120,13 @@ public class MainActivity extends AppCompatActivity {
         welcome_text = findViewById(R.id.welcome_status);
         chartRadar = findViewById(R.id.chart_radar);
         viewFlipper = findViewById(R.id.viewflipper);
+        eventDetails = findViewById(R.id.eventDetails);
+        eventDetailsImage = findViewById(R.id.eventDetailsImage);
+        eventDetailsObject = findViewById(R.id.eventDetailsIcon);
+        eventDetailsTimeBegin = findViewById(R.id.eventDetailsTimeBegin);
+        eventDetailsTimeEnd = findViewById(R.id.eventDetailsTimeEnd);
+        eventDetailsDate = findViewById(R.id.eventDetailsDate);
+
 
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "events")
                 .build();
@@ -125,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         timelineAdapter = new EventAdapter(getLayoutInflater(), this, R.layout.recycler_vertical_row);
         recyclerView.addItemDecoration(getSectionCallback(timelineAdapter));
         recyclerView.setAdapter(timelineAdapter);
+
 
 
         int TIMEOUT = 3600;
@@ -141,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
         viewFlipper.setDisplayedChild(5);
 
         Button apply = findViewById(R.id.settings_apply);
+        Button clearAll = findViewById(R.id.clear_all);
         Button buttonWelcome = findViewById(R.id.welcome_continue);
         ImageButton button_statistic = findViewById(R.id.button1);
         ImageButton button_camera = findViewById(R.id.button2);
@@ -154,9 +171,17 @@ public class MainActivity extends AppCompatActivity {
         ImageButton suprised = findViewById(R.id.suprised);
         ImageButton angry = findViewById(R.id.angry);
 
+
+
         apply.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ip = sett_text.getText().toString();
+            }
+        });
+
+        clearAll.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
             }
         });
 
@@ -401,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void downloadFile(String fileName) {
-            if(fileName == "" || fileName == null || fileName == "null"){
+            if (fileName == "" || fileName == null || fileName == "null") {
                 return;
             }
 //            Log.d("files", "getFilesDir=" + getApplicationContext().getFilesDir());
@@ -410,11 +435,11 @@ public class MainActivity extends AppCompatActivity {
 //            Log.d("files", "Environment.getStorageDirectory=" + Environment.getStorageDirectory());
             try {
                 var file = new File(filesDir, fileName);
-                if(file.exists())
+                if (file.exists())
                     return;
 
                 Log.d("files", "Загрузка файла " + fileName);
-                Boolean success = HttpDownloadUtility.downloadFile(String.format("http://%s:5000/files/%s", ip, fileName), filesDir.getPath(), fileName);
+                Boolean success = HttpDownloadUtility.downloadFile(String.format("http://%s:8080/files/%s", ip, fileName), filesDir.getPath(), fileName);
                 Log.d("files", "Успешная загрузка " + fileName);
                 Log.d("files", success.toString());
 
@@ -440,13 +465,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public LocalDateTime ToLocalDate(Date dateToConvert) {
-        return  (
+        return (
                 dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         );
     }
 
     //private SimpleDateFormat shortDateFormatter = new SimpleDateFormat("EEE, dd MMMM yyyy");
     private DateTimeFormatter shortDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMMM yyyy", new Locale("ru"));
+
     private SectionCallback getSectionCallback(final EventAdapter eventListAdapter) {
         return new SectionCallback() {
 

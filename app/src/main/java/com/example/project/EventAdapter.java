@@ -33,6 +33,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss", new Locale("ru"));
 
 
+
     public EventAdapter(LayoutInflater layoutInflater, MainActivity activity, @LayoutRes int rowLayout) {
         this.layoutInflater = layoutInflater;
         this.eventList = new ArrayList<>();
@@ -45,18 +46,60 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = layoutInflater.inflate(rowLayout, parent, false);
-        return new ViewHolder(v);
+
+        ViewHolder viewHolder = new ViewHolder(v);
+        v.setOnClickListener(v1 -> {
+            Log.d("ui", "card view click:" +( (Event) v1.getTag()).filePhoto);
+            Event event = (Event) v1.getTag();
+            var file = new File(this.mainActivity.filesDir, event.filePhoto);
+
+            mainActivity.viewFlipper.setDisplayedChild(8);
+            mainActivity.eventDetails.setTag(v1.getTag());
+            mainActivity.eventDetailsImage.setImageURI(Uri.fromFile(file));
+            mainActivity.eventDetailsTimeBegin.setText(ToLocalDate(event.start).format(timeFormatter));
+            mainActivity.eventDetailsTimeEnd.setText(ToLocalDate(event.end).format(timeFormatter));
+            mainActivity.eventDetailsDate.setText(ToLocalDate(event.start).format(shortDateFormatter));
+
+            int icon = R.drawable.cat;
+            switch (event.object) {
+                case "cat":
+                    icon = R.drawable.cat;
+                    break;
+                case "dog":
+                    icon = R.drawable.dog;
+                    break;
+                case "person":
+                    icon = R.drawable.person;
+                    break;
+                case "face":
+                    icon = R.drawable.face;
+                    break;
+
+            }
+
+            mainActivity.eventDetailsObject.setImageResource(icon);
+
+
+        });
+
+        return viewHolder;
     }
 
 
     public LocalDateTime ToLocalDate(Date dateToConvert) {
-        return  (
+        return (
                 dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         );
     }
+
+    private DateTimeFormatter shortDateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMMM yyyy", new Locale("ru"));
+
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Event event = eventList.get(position);
+        holder.id = event.id;
+        holder.itemView.setTag(event);
         holder.fullName.setText(event.title);
         holder.date.setText(ToLocalDate(event.start).format(timeFormatter));
 
@@ -106,6 +149,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         public final TextView date;
         public final ImageView pic;
         public final ImageView icon;
+
+        public int id;
 
 
         public ViewHolder(View view) {
