@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="BIMO">#5FBAA5</color>
+    <color name="BIMO_face">#C6E2C0</color>
+    <color name="text_color">#FF49454F</color>
+    <color name="warm_white">#E8F4E6</color>
+    <color name="transparent">#000000FF</color>
+
+</resources>

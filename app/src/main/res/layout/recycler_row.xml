@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_weight="1">
+
+    <xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
+        android:id="@+id/vertical_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:isSticky="true"
+        android:layout_weight="1"
+        app:timeLineColor="@color/warm_white"
+        app:timeLineDotColor="@color/BIMO"
+
+        app:sectionTitleTextSize="22sp"
+        app:sectionTitleTextColor="@color/text_color"
+        app:sectionSubTitleTextSize="18sp"
+        app:sectionSubTitleTextColor="@color/text_color"
+
+        app:sectionBackgroundColor="@color/BIMO_face"
+        app:timeLineDotRadius="4dp"
+        app:timeLineDotStrokeColor="#ffffff"
+        app:timeLineDotStrokeSize="2dp"
+        app:timeLineMode="vertical"
+        app:timeLineWidth="4dp" />
+
+</LinearLayout>
