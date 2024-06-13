@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(final Void... args) {
-            //eventDao.Clear();
+            eventDao.Clear();
             lastUpdated = eventDao.getMaxUpdated();
 
             while (true) {

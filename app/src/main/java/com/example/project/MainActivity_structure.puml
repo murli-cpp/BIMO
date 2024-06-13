@@ -1,0 +1,259 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.example.project.MainActivity",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1322970774 { 
+   	label=example
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1138778773 { 
+   	label=project
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   AppDatabase393306072[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AppDatabase</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ eventDao(): EventDao</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AppDatabase_Impl393306072[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AppDatabase_Impl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   _eventDao: EventDao [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ clearAllTables()</TD></TR>
+<TR><TD ALIGN="LEFT" ># createInvalidationTracker(): InvalidationTracker</TD></TR>
+<TR><TD ALIGN="LEFT" ># createOpenHelper(config: DatabaseConfiguration): SupportSQLiteOpenHelper</TD></TR>
+<TR><TD ALIGN="LEFT" >+ eventDao(): EventDao</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getAutoMigrations(autoMigrationSpecs: Map&lt;Class&lt;? extends AutoMigrationSpec&gt;, AutoMigrationSpec&gt;): List&lt;Migration&gt;</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Event393306072[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Event</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+   duration: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   end: Date [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   fileAudio: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   filePhoto: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   fileVideo: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   id: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   object: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   start: Date [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   title: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   type: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   updated: Date [0..1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EventAdapter393306072[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EventAdapter</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+   eventList: List&lt;Event&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fetchEventsUpdateFromDBTask: FetchEventsUpdateFromDB [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   layoutInflater: LayoutInflater [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mainActivity: MainActivity [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   rowLayout: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   shortDateFormatter: DateTimeFormatter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   timeFormatter: DateTimeFormatter [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ ToLocalDate(dateToConvert: Date): LocalDateTime</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onBindViewHolder(holder: ViewHolder, position: int)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateViewHolder(parent: ViewGroup, viewType: int): ViewHolder</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+FetchEventsUpdateFromDB1379735685[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FetchEventsUpdateFromDB</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   dao: EventDao [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   lastUpdated: Date [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># doInBackground(args: String...): Boolean</TD></TR>
+<TR><TD ALIGN="LEFT" ># onPreExecute()</TD></TR>
+<TR><TD ALIGN="LEFT" ># onProgressUpdate(value: List&lt;Event&gt;...)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+MainActivity393306072[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)MainActivity</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   VF_CAM: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_EMO: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_INSTR: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_SETT: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_STAT: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_TIMELINE: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_TIMELINE_DETAILS: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   VF_WELCOME: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   back_button: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   cardView: CardView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   chartRadar: RadarChart [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   db: AppDatabase [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   drawable: View [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetails: LinearLayout [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetailsDate: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetailsImage: ZoomageView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetailsObject: ImageView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetailsTimeBegin: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   eventDetailsTimeEnd: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   filesDir: File [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   icBuzz: Drawable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   icFinkl: Drawable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   icGirlsGeneration: Drawable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   icSolo: Drawable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   icWannaOne: Drawable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   ip: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   layout: LinearLayout [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   mjpegView: MjpegView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   player: ExoPlayer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   playerView: PlayerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   recyclerView: TimeLineRecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   sett_text: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   shortDateFormatter: DateTimeFormatter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   statusText: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   text_camera: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   text_chart: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   timelineAdapter: EventAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   viewFlipper: ViewFlipper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   welcome_text: TextView [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ ToLocalDate(dateToConvert: Date): LocalDateTime</TD></TR>
+<TR><TD ALIGN="LEFT" >- getSectionCallback(eventListAdapter: EventAdapter): SectionCallback</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+AppDatabase393306072 -> AppDatabase_Impl393306072[arrowhead=none, arrowtail=empty, dir=both];
+EventAdapter393306072 -> Event393306072[label="eventList
+[0..*]"];
+EventAdapter393306072 -> FetchEventsUpdateFromDB1379735685[label="fetchEventsUpdateFromDBTask
+[0..1]"];
+EventAdapter393306072 -> MainActivity393306072[label="mainActivity
+[0..1]"];
+MainActivity393306072 -> AppDatabase393306072[label="db
+[0..1]"];
+MainActivity393306072 -> EventAdapter393306072[label="timelineAdapter
+[0..1]"];
+    
+}
+@enduml
